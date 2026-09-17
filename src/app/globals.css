@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3f1fb;
+  --bg-gradient: linear-gradient(160deg, #eef0fc 0%, #f7eef7 40%, #eef8f4 75%, #f3f1fb 100%);
+  --foreground: #262340;
+  --surface: 255 255 255;
+  --surface-alpha: 0.62;
+  --surface-solid: #ffffff;
+  --surface-muted: #f1eefb;
+  --border-soft: rgba(70, 60, 130, 0.1);
+  --shadow-color: 60 50 130;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface-solid);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-soft: var(--border-soft);
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand — soft periwinkle/indigo, the primary chrome accent */
+  --color-brand-50: #f1effc;
+  --color-brand-100: #e4e0f9;
+  --color-brand-200: #c9c1f2;
+  --color-brand-300: #a99ce8;
+  --color-brand-400: #8b7bdd;
+  --color-brand-500: #7566d1;
+  --color-brand-600: #6152be;
+  --color-brand-700: #4e41a0;
+  --color-brand-800: #3d3380;
+  --color-brand-900: #2c2560;
+  --color-brand-950: #1b1740;
+
+  /* Secondary — soft mint/teal, for "stable" / positive states */
+  --color-sage-50: #eafbf6;
+  --color-sage-100: #d2f5ea;
+  --color-sage-400: #4fcbae;
+  --color-sage-600: #2ba98b;
+  --color-sage-700: #21826c;
+  --color-sage-800: #1c6759;
+  --color-sage-900: #164f45;
+
+  /* Decorative — blush pink, used only for background accents */
+  --color-blush-200: #f6d3e6;
+  --color-blush-300: #edb3d1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171429;
+    --bg-gradient: linear-gradient(160deg, #191430 0%, #1e1732 45%, #131d26 100%);
+    --foreground: #ece9fb;
+    --surface: 255 255 255;
+    --surface-alpha: 0.06;
+    --surface-solid: #211c38;
+    --surface-muted: #241f3d;
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --shadow-color: 0 0 0;
+  }
+}
+
+body {
+  background: var(--bg-gradient) fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* ---- Shared "glass card" surface ---- */
+.echo-card {
+  background: rgb(var(--surface) / var(--surface-alpha));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    0 1px 1px rgb(var(--shadow-color) / 0.03),
+    0 16px 40px -20px rgb(var(--shadow-color) / 0.28);
+}
+
+.echo-surface-muted {
+  background: var(--surface-muted);
+}
+
+/* ---- Brain twin ---- */
+.echo-brain-twin svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 30px 40px rgb(var(--shadow-color) / 0.22));
+}
+
+.echo-brain-twin #canvas {
+  fill: transparent;
+}
+
+/* The illustration ships a hidden #cleanup group of small seam-patch rects that cover
+   sub-pixel gaps between adjacent shape edges — most are colored to match the
+   anatomy on either side of the gap they patch and must stay. A handful are colored
+   to match the original opaque white canvas (#FEFEFE) instead; with the canvas now
+   transparent, those specific patches would show the page background through the
+   gap as a stray colored line rather than blending in, so only those are hidden. */
+.echo-brain-twin #cleanup rect[fill="#FEFEFE"] {
+  fill: transparent;
+}
+
+.echo-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: echo-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes echo-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  70% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .echo-pulse {
+    animation: none;
+  }
+}
+
+@keyframes echo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.echo-float {
+  animation: echo-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .echo-float {
+    animation: none;
+  }
+}
