@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { Bell } from "lucide-react";
 import { PATIENT, CAREGIVER_OBSERVATIONS } from "@/lib/mockData";
-import { allDomainProgress, brainTwinState, domainLabels } from "@/lib/twin";
-import { find_first_change } from "@/lib/tools";
+import { domainLabels, brainTwinState } from "@/lib/twin";
+import { allDomainProgress, find_first_change } from "@/lib/agents/progressionAgent";
+import { detectMeaningfulChanges } from "@/lib/agents/monitoringAgent";
 import { readBrainSvg } from "@/lib/svg";
 import { formatDate, DOMAIN_COLORS } from "@/lib/visual";
 import BrainTwinPreview from "@/components/BrainTwinPreview";
 import ProgressionChart from "@/components/ProgressionChart";
 import DeviationTimeline from "@/components/DeviationTimeline";
 import DomainStatCard from "@/components/DomainStatCard";
+import NotificationBell from "@/components/NotificationBell";
 import Card from "@/components/Card";
 
 const initials = PATIENT.name
@@ -22,7 +23,7 @@ export default function DashboardPage() {
   const byKey = Object.fromEntries(domains.map((d) => [d.domain, d]));
   const leftDomains = ["memory", "language", "function", "routine"];
   const rightDomains = ["executive", "spatial", "attention", "processingSpeed"];
-  const meaningfulChanges = domains.filter((d) => d.trend === "declining");
+  const meaningfulChanges = detectMeaningfulChanges();
   const regions = brainTwinState();
   const svg = readBrainSvg();
   const events = find_first_change().slice(0, 4);
@@ -54,18 +55,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative echo-card h-11 w-11 flex items-center justify-center text-foreground/60 hover:text-brand-600 transition-colors"
-          >
-            <Bell size={18} />
-            {meaningfulChanges.length > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-semibold">
-                {meaningfulChanges.length}
-              </span>
-            )}
-          </button>
+          <NotificationBell changes={meaningfulChanges} />
           <div className="h-11 w-11 rounded-full bg-gradient-to-br from-blush-300 to-brand-400 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-brand-900/15">
             {initials}
           </div>
@@ -143,10 +133,10 @@ export default function DashboardPage() {
           <h2 className="text-sm font-semibold text-foreground mb-4">Meaningful changes</h2>
           <ul className="space-y-2.5">
             {meaningfulChanges.length === 0 && <li className="text-sm text-foreground/40">No meaningful changes detected.</li>}
-            {meaningfulChanges.map((d) => (
-              <li key={d.domain} className="flex items-center justify-between text-sm">
-                <span className="capitalize text-foreground/75">{domainLabels[d.domain as keyof typeof domainLabels] ?? d.domain}</span>
-                <span className="text-rose-600 dark:text-rose-400 font-medium tabular-nums">↓ {Math.abs(d.change)}</span>
+            {meaningfulChanges.map((c) => (
+              <li key={c.domain} className="flex items-center justify-between text-sm">
+                <span className="capitalize text-foreground/75">{c.label}</span>
+                <span className="text-rose-600 dark:text-rose-400 font-medium tabular-nums">↓ {Math.abs(c.change)}</span>
               </li>
             ))}
           </ul>

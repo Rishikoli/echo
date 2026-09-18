@@ -1,10 +1,8 @@
 import { Suspense } from "react";
-import { brainTwinState } from "@/lib/twin";
 import { readBrainSvg } from "@/lib/svg";
 import BrainExplorer from "@/components/BrainExplorer";
 
 export default function BrainPage() {
-  const regions = brainTwinState();
   const svg = readBrainSvg();
 
   return (
@@ -13,12 +11,12 @@ export default function BrainPage() {
         <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">Brain Twin</h1>
         <p className="text-sm text-foreground/55 mt-2 max-w-2xl leading-relaxed">
           An interactive visualization of the Digital Twin&rsquo;s state — not a clinical anatomical diagnosis.
-          Each region maps to one or more tracked cognitive domains, compared against the patient&rsquo;s own
-          personal baseline.
+          Drag the timeline below to watch it evolve month by month, each state measured against the
+          patient&rsquo;s own personal baseline.
         </p>
       </header>
       <Suspense>
-        <BrainExplorer svgMarkup={svg} regions={regions} />
+        <BrainExplorer svgMarkup={svg} />
       </Suspense>
     </div>
   );

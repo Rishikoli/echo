@@ -1,0 +1,29 @@
+// Paste into app/build.gradle.kts — dependency versions are illustrative; pin to
+// whatever is current at build time and re-check the API surface used in
+// OnDeviceSynthesisEngine.kt against that version's docs before relying on it.
+
+dependencies {
+    // MediaPipe GenAI tasks — the LLM Inference API used to run Gemma 3n on-device.
+    implementation("com.google.mediapipe:tasks-genai:0.10.24")
+
+    // Coroutines, for the suspend-function wrapper around the (callback-based)
+    // inference API — see OnDeviceSynthesisEngine.kt.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    // JSON parsing for the tool-output payload handed to the model — kotlinx.serialization
+    // is used here for parity with the strict-JSON contract the web prototype's
+    // Gemini call already relies on (responseMimeType: "application/json").
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Only needed if CloudSynthesisEngine (the fallback path) is kept in the build —
+    // an OkHttp client for the Gemini REST API, mirroring @google/generative-ai's
+    // role in the web prototype.
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+}
+
+android {
+    // The .task model file is large (multi-GB even at INT4) — do not bundle it as
+    // an APK asset. Download it on first run into app-private storage
+    // (context.filesDir) instead, or ship it via Play Asset Delivery. Bundling a
+    // multi-GB asset directly inflates the APK past normal distribution limits.
+}

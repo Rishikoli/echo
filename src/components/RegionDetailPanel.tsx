@@ -9,7 +9,13 @@ import StatePill from "./StatePill";
 import EvidenceList from "./EvidenceList";
 import Card from "./Card";
 
-export default function RegionDetailPanel({ region }: { region: BrainRegionState | null }) {
+export default function RegionDetailPanel({
+  region,
+  asOfDate,
+}: {
+  region: BrainRegionState | null;
+  asOfDate?: string;
+}) {
   if (!region) {
     return (
       <div className="rounded-2xl border border-dashed border-border-soft p-6 text-center text-sm text-foreground/40">
@@ -31,7 +37,7 @@ export default function RegionDetailPanel({ region }: { region: BrainRegionState
     );
   }
 
-  const evidence = region.domains.flatMap((d) => get_evidence(domainLabels[d])).slice(0, 6);
+  const evidence = region.domains.flatMap((d) => get_evidence(domainLabels[d], asOfDate)).slice(0, 6);
   const domainNames = region.domains.map((d) => domainLabels[d]).join(" & ");
 
   return (
@@ -69,12 +75,12 @@ export default function RegionDetailPanel({ region }: { region: BrainRegionState
         <span className="text-foreground/50">Trend</span>
         <span className="font-medium text-foreground">{TREND_LABEL[region.trend]}</span>
       </div>
-      {region.earliestDeviation && (
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-foreground/50">Earliest detected deviation</span>
-          <span className="font-medium text-foreground">{formatDate(region.earliestDeviation)}</span>
-        </div>
-      )}
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-foreground/50">Earliest detected deviation</span>
+        <span className="font-medium text-foreground">
+          {region.earliestDeviation ? formatDate(region.earliestDeviation) : "None detected yet"}
+        </span>
+      </div>
 
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground/40 mb-2">Evidence</h3>

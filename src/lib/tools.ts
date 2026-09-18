@@ -53,7 +53,7 @@ export function detect_progression(windowLabel = "6_month") {
 
 // "What changed first?" — reconstructs the temporal sequence of deviations across
 // modalities, using the earliest-observed-deviation timestamps plus caregiver notes.
-export function find_first_change(): DeviationEvent[] {
+export function find_first_change(asOfDate?: string): DeviationEvent[] {
   const events: DeviationEvent[] = [
     {
       date: "2026-03-10",
@@ -80,10 +80,11 @@ export function find_first_change(): DeviationEvent[] {
       evidenceIds: ["routine-2026-03-20", "cg-CG07"],
     },
   ];
-  return events.sort((a, b) => a.date.localeCompare(b.date));
+  const filtered = asOfDate ? events.filter((e) => e.date <= asOfDate) : events;
+  return filtered.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export function get_evidence(domain?: string): EvidenceItem[] {
+export function get_evidence(domain?: string, asOfDate?: string): EvidenceItem[] {
   const items: EvidenceItem[] = [];
 
   for (const s of SPEECH_SESSIONS) {
@@ -130,14 +131,15 @@ export function get_evidence(domain?: string): EvidenceItem[] {
     confidence: 0.82,
   });
 
-  const filtered = domain
+  const byDomain = domain
     ? items.filter((i) =>
         i.summary.toLowerCase().includes(domain.toLowerCase()) ||
         i.source.toLowerCase().includes(domain.toLowerCase())
       )
     : items;
+  const byDate = asOfDate ? byDomain.filter((i) => i.date <= asOfDate) : byDomain;
 
-  return filtered.sort((a, b) => a.date.localeCompare(b.date));
+  return byDate.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 // "Has this happened before?" — compares the current period against the historical

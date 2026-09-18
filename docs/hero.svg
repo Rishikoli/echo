@@ -1,0 +1,68 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ECHO — a personal-baseline Digital Twin for dementia care">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eef0fc"/>
+      <stop offset="45%" stop-color="#f7eef7"/>
+      <stop offset="100%" stop-color="#eef8f4"/>
+    </linearGradient>
+    <linearGradient id="dot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b7bdd"/>
+      <stop offset="100%" stop-color="#6152be"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9c1f2" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#c9c1f2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <circle cx="1040" cy="90" r="150" fill="url(#glow)"/>
+  <circle cx="120" cy="270" r="120" fill="#d2f5ea" opacity="0.45"/>
+
+  <text x="80" y="128" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="64" font-weight="800" fill="#262340" letter-spacing="-1.5">ECHO</text>
+  <text x="80" y="168" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="500" fill="#59537f">A personal-baseline Digital Twin for dementia care</text>
+
+  <!-- agent pipeline motif: Router -> four deterministic agents -> Synthesis -->
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700">
+    <g transform="translate(80,220)">
+      <rect x="0" y="0" width="96" height="34" rx="17" fill="#6152be"/>
+      <text x="48" y="22" text-anchor="middle" fill="#ffffff">Router</text>
+    </g>
+    <line x1="184" y1="237" x2="224" y2="237" stroke="#c9c1f2" stroke-width="2"/>
+
+    <g transform="translate(232,190)">
+      <rect x="0" y="0" width="112" height="30" rx="15" fill="#ffffff" stroke="#d8d2f2"/>
+      <text x="56" y="20" text-anchor="middle" fill="#59537f">Progression</text>
+    </g>
+    <g transform="translate(232,226)">
+      <rect x="0" y="0" width="112" height="30" rx="15" fill="#ffffff" stroke="#d8d2f2"/>
+      <text x="56" y="20" text-anchor="middle" fill="#59537f">Evidence</text>
+    </g>
+    <g transform="translate(232,262)">
+      <rect x="0" y="0" width="112" height="30" rx="15" fill="#ffffff" stroke="#d8d2f2"/>
+      <text x="56" y="20" text-anchor="middle" fill="#59537f">Memory</text>
+    </g>
+
+    <line x1="344" y1="237" x2="384" y2="237" stroke="#c9c1f2" stroke-width="2"/>
+
+    <g transform="translate(392,220)">
+      <rect x="0" y="0" width="120" height="34" rx="17" fill="url(#dot)"/>
+      <text x="60" y="22" text-anchor="middle" fill="#ffffff">Synthesis</text>
+    </g>
+    <line x1="512" y1="237" x2="552" y2="237" stroke="#c9c1f2" stroke-width="2"/>
+
+    <g transform="translate(560,220)">
+      <rect x="0" y="0" width="96" height="34" rx="17" fill="#f1eefb" stroke="#d8d2f2"/>
+      <text x="48" y="22" text-anchor="middle" fill="#59537f">Answer</text>
+    </g>
+  </g>
+
+  <g fill="none" stroke="#8b7bdd" stroke-width="2.5">
+    <circle cx="900" cy="200" r="4" fill="#8b7bdd"/>
+    <circle cx="940" cy="235" r="4" fill="#4fcbae"/>
+    <circle cx="985" cy="190" r="4" fill="#e3a63c"/>
+    <circle cx="1030" cy="230" r="4" fill="#8b7bdd"/>
+    <circle cx="1075" cy="195" r="4" fill="#4fcbae"/>
+    <path d="M900 200 L940 235 L985 190 L1030 230 L1075 195" opacity="0.5"/>
+  </g>
+</svg>

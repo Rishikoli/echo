@@ -17,6 +17,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as tools from "./tools";
 import type { EvidenceItem, InvestigationResult, ToolTraceStep } from "./types";
 import { domainLabels } from "./twin";
+import { classifyIntent } from "./agents/routerAgent";
 
 export const SYSTEM_PROMPT = `You are the ECHO Twin Orchestrator.
 
@@ -46,7 +47,6 @@ function routeQuestion(question: string): {
   evidence: EvidenceItem[];
   payload: Record<string, unknown>;
 } {
-  const q = question.toLowerCase();
   const trace: ToolTraceStep[] = [];
 
   const call = <T,>(name: string, fn: () => T, summary: string): T => {
@@ -55,34 +55,38 @@ function routeQuestion(question: string): {
     return result;
   };
 
-  if (q.includes("changed first") || q.includes("first change") || q.includes("earliest")) {
+  // Router Agent decides intent; this function dispatches to the Progression/
+  // Evidence agents (tools.ts) based on that decision.
+  const intent = classifyIntent(question);
+
+  if (intent === "first_change") {
     const events = call("find_first_change", tools.find_first_change, "Reconstructed temporal sequence of deviations.");
     const evidence = call("get_evidence", () => tools.get_evidence(), "Retrieved supporting evidence.");
-    return { intent: "first_change", trace, evidence, payload: { events } };
+    return { intent, trace, evidence, payload: { events } };
   }
 
-  if (q.includes("happened before") || q.includes("similar") || q.includes("before")) {
+  if (intent === "similar_period") {
     const similarity = call("find_similar_period", tools.find_similar_period, "Compared current period against historical windows.");
     const evidence = call("get_evidence", () => tools.get_evidence(), "Retrieved supporting evidence.");
-    return { intent: "similar_period", trace, evidence, payload: { similarity } };
+    return { intent, trace, evidence, payload: { similarity } };
   }
 
-  if (q.includes("why") || q.includes("flagged") || q.includes("forensic")) {
+  if (intent === "forensics") {
     const events = call("find_first_change", tools.find_first_change, "Reconstructed the flagged-period timeline.");
     const evidence = call("get_evidence", () => tools.get_evidence(), "Retrieved evidence graph for the flagged period.");
-    return { intent: "forensics", trace, evidence, payload: { events } };
+    return { intent, trace, evidence, payload: { events } };
   }
 
-  if (q.includes("evidence")) {
+  if (intent === "evidence") {
     const evidence = call("get_evidence", () => tools.get_evidence(), "Retrieved full evidence list.");
-    return { intent: "evidence", trace, evidence, payload: {} };
+    return { intent, trace, evidence, payload: {} };
   }
 
   // Default: general "what changed?" investigation.
   const progression = call("detect_progression", () => tools.detect_progression(), "Ran progression engine across all domains.");
   const evidence = call("get_evidence", () => tools.get_evidence(), "Retrieved supporting evidence.");
   call("compare_personal_baseline", () => tools.get_cognitive_trajectory(), "Compared each domain against personal baseline.");
-  return { intent: "what_changed", trace, evidence, payload: { progression } };
+  return { intent, trace, evidence, payload: { progression } };
 }
 
 function templateSynthesis(
