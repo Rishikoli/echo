@@ -9,9 +9,30 @@ import Card from "./Card";
 import TimelineScrubber from "./TimelineScrubber";
 import { brainTwinState, monthEndDate } from "@/lib/twin";
 import { MONTHLY_SNAPSHOTS } from "@/lib/mockData";
+import { STATE_COLORS } from "@/lib/visual";
+import type { RegionVisualState } from "@/lib/types";
 
 const MONTH_LABELS = MONTHLY_SNAPSHOTS.map((s) => s.label);
 const LATEST_INDEX = MONTHLY_SNAPSHOTS.length - 1;
+
+// One color per month for the timeline scrubber's track/thumb — the worst
+// (most severe) region state that month, using the same state colors as the brain itself.
+const SEVERITY: Record<RegionVisualState, number> = {
+  "insufficient-data": -1,
+  stable: 0,
+  changing: 1,
+  declining: 2,
+};
+
+function worstStateColor(monthIdx: number): string {
+  const worst = brainTwinState(monthIdx).reduce<RegionVisualState>(
+    (acc, r) => (SEVERITY[r.state] > SEVERITY[acc] ? r.state : acc),
+    "stable"
+  );
+  return STATE_COLORS[worst].dot;
+}
+
+const MONTH_COLORS = MONTHLY_SNAPSHOTS.map((_, i) => worstStateColor(i));
 
 export default function BrainExplorer({ svgMarkup }: { svgMarkup: string }) {
   const searchParams = useSearchParams();
@@ -37,6 +58,7 @@ export default function BrainExplorer({ svgMarkup }: { svgMarkup: string }) {
         onChange={setMonthIndex}
         playing={playing}
         onPlayingChange={setPlaying}
+        monthColors={MONTH_COLORS}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">

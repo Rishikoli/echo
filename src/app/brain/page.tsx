@@ -10,9 +10,8 @@ export default function BrainPage() {
       <header>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">Brain Twin</h1>
         <p className="text-sm text-foreground/55 mt-2 max-w-2xl leading-relaxed">
-          An interactive visualization of the Digital Twin&rsquo;s state — not a clinical anatomical diagnosis.
-          Drag the timeline below to watch it evolve month by month, each state measured against the
-          patient&rsquo;s own personal baseline.
+          An interactive visualization of the Digital Twin&rsquo;s state. Drag the timeline below to watch
+          it evolve month by month, each state measured against the patient&rsquo;s own personal baseline.
         </p>
       </header>
       <Suspense>

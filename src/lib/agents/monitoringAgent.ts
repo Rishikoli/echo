@@ -1,14 +1,11 @@
-// MONITORING AGENT — new in this round.
+// MONITORING AGENT
 // Watches the Twin's computed state and decides what counts as "meaningful" enough
 // to surface proactively, rather than waiting for a caregiver to go looking for it.
-// This formalizes logic that previously lived inline in the dashboard page (a plain
-// array filter) into an agent with its own name and a real notification side effect.
 //
-// Round 1: a genuine browser Notification, permission-gated and user-gesture
-// triggered (the bell button) — not a cosmetic badge with no function behind it.
-// Round 2: identical detection logic; the notification call becomes a native
-// Android notification from a background-scheduled check instead of a foreground
-// browser API call.
+// Today: a browser Notification, permission-gated and user-gesture triggered (the
+// bell button). Planned: identical detection logic; the notification call becomes
+// a native Android notification from a background-scheduled check instead of a
+// foreground browser API call.
 
 import { allDomainProgress, domainLabels } from "../twin";
 import type { DomainProgress } from "../twin";

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { LayoutGrid, Brain, TrendingUp, Network, Search, SlidersHorizontal, UploadCloud, Workflow } from "lucide-react";
+import { LayoutGrid, Brain, TrendingUp, Network, Search, SlidersHorizontal, Puzzle, Workflow } from "lucide-react";
 import { PATIENT } from "@/lib/mockData";
 
 const PRIMARY = [
@@ -13,7 +13,7 @@ const PRIMARY = [
   { href: "/memory", label: "Memory", icon: Network },
   { href: "/investigate", label: "Investigate", icon: Search },
   { href: "/scenario", label: "Scenario", icon: SlidersHorizontal },
-  { href: "/upload", label: "Upload", icon: UploadCloud },
+  { href: "/recall", label: "Recall", icon: Puzzle },
   { href: "/architecture", label: "Architecture", icon: Workflow },
 ];
 

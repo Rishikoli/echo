@@ -1,8 +1,6 @@
-// Real, lightweight acoustic analysis of an uploaded audio file, computed entirely
-// client-side via the Web Audio API. This is NOT a transcription or ML pipeline —
-// there's no Whisper/WavLM here — it's honest signal-level analysis (energy-based
-// voice-activity detection), clearly scoped as a proxy rather than pretending to be
-// full speech biomarker extraction.
+// Lightweight acoustic analysis of an uploaded audio file, computed entirely
+// client-side via the Web Audio API: energy-based voice-activity detection, not
+// a transcription or ML pipeline. Scoped as a proxy for speech biomarker extraction.
 
 export interface SpeechAnalysisResult {
   durationSec: number;

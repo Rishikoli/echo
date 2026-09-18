@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import clsx from "clsx";
 
@@ -11,6 +11,10 @@ interface TimelineScrubberProps {
   playing: boolean;
   onPlayingChange: (playing: boolean) => void;
   intervalMs?: number;
+  /** One color per label, e.g. that month's worst region state — drives the
+   * track's gradient and the thumb's current color. Falls back to a flat brand
+   * color if omitted. */
+  monthColors?: string[];
 }
 
 export default function TimelineScrubber({
@@ -20,8 +24,13 @@ export default function TimelineScrubber({
   playing,
   onPlayingChange,
   intervalMs = 1400,
+  monthColors,
 }: TimelineScrubberProps) {
   const max = labels.length - 1;
+  const trackGradient = monthColors?.length
+    ? `linear-gradient(90deg, ${monthColors.map((c, i) => `${c} ${(i / (monthColors.length - 1 || 1)) * 100}%`).join(", ")})`
+    : undefined;
+  const thumbColor = monthColors?.[value];
   const valueRef = useRef(value);
   const onChangeRef = useRef(onChange);
   const onPlayingChangeRef = useRef(onPlayingChange);
@@ -80,7 +89,13 @@ export default function TimelineScrubber({
               onPlayingChange(false);
               onChange(Number(e.target.value));
             }}
-            className="w-full accent-brand-600"
+            className="echo-range w-full"
+            style={
+              {
+                "--echo-track-gradient": trackGradient,
+                "--echo-thumb-color": thumbColor,
+              } as CSSProperties
+            }
             aria-label="Month"
           />
           <div className="flex justify-between mt-1 px-0.5">

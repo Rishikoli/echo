@@ -260,6 +260,28 @@ export const MEMORY_NODES: MemoryNode[] = [
   { id: "diwaliphoto", type: "photo", label: "Diwali Photo", subtitle: "Family photograph", confidence: 0.92, x: 96, y: 30, detail: "Whole family in front of the diyas at Home, Nov 2025." },
 ];
 
+// Structured routine steps — the same facts already described in MEMORY_NODES'
+// morningroutine/eveningroutine `detail` strings, broken out as an ordered array
+// for the Routine Recall game rather than re-parsed from prose at runtime.
+export interface RoutineStep {
+  time: string;
+  label: string;
+}
+
+export const ROUTINE_STEPS: Record<"morning" | "evening", RoutineStep[]> = {
+  morning: [
+    { time: "07:30", label: "Wake" },
+    { time: "08:00", label: "Breakfast" },
+    { time: "08:30", label: "Medication" },
+    { time: "09:00", label: "Walk" },
+  ],
+  evening: [
+    { time: "19:00", label: "Dinner" },
+    { time: "19:45", label: "Hindi music" },
+    { time: "20:30", label: "Bed" },
+  ],
+};
+
 export const MEMORY_EDGES: MemoryEdge[] = [
   { id: "e1", from: "patient", to: "priya", relationship: "PARENT_OF", label: "parent of" },
   { id: "e2", from: "patient", to: "arjun", relationship: "PARENT_OF", label: "parent of" },

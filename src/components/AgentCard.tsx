@@ -44,12 +44,12 @@ export default function AgentCard({ agent }: { agent: AgentSpec }) {
 
       <div className="grid grid-cols-1 gap-2 text-xs pt-3 border-t border-border-soft">
         <div>
-          <span className="text-foreground/40">Round 1: </span>
-          <span className="text-foreground/70">{agent.round1}</span>
+          <span className="text-foreground/40">Today: </span>
+          <span className="text-foreground/70">{agent.today}</span>
         </div>
         <div>
-          <span className="text-foreground/40">Round 2: </span>
-          <span className="text-foreground/70">{agent.round2}</span>
+          <span className="text-foreground/40">Planned: </span>
+          <span className="text-foreground/70">{agent.planned}</span>
         </div>
       </div>
 

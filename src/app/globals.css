@@ -160,6 +160,78 @@ body {
   animation: echo-pulse 2.2s ease-in-out infinite;
 }
 
+/* ---- Timeline scrubber: color-coded track + animated thumb ---- */
+/* The track's background is a gradient built from each month's severity color
+   (--echo-track-gradient, set inline by TimelineScrubber.tsx from brainTwinState()
+   data) — the same green→amber→rose scale used everywhere else in the app. The
+   thumb's color transitions smoothly to match whatever month it's currently on
+   (--echo-thumb-color), so dragging or playing the scrubber shifts the thumb's
+   color in step with the data. */
+.echo-range {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.echo-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--echo-track-gradient, var(--surface-muted));
+}
+
+.echo-range::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--echo-track-gradient, var(--surface-muted));
+}
+
+.echo-range::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--echo-thumb-color, var(--color-brand-600));
+  border: 3px solid var(--surface-solid);
+  box-shadow: 0 2px 8px rgb(var(--shadow-color) / 0.3);
+  cursor: pointer;
+  transition: background-color 0.45s ease, transform 0.15s ease;
+}
+
+.echo-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--echo-thumb-color, var(--color-brand-600));
+  border: 3px solid var(--surface-solid);
+  box-shadow: 0 2px 8px rgb(var(--shadow-color) / 0.3);
+  cursor: pointer;
+  transition: background-color 0.45s ease, transform 0.15s ease;
+}
+
+.echo-range:hover::-webkit-slider-thumb,
+.echo-range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.echo-range:hover::-moz-range-thumb,
+.echo-range:active::-moz-range-thumb {
+  transform: scale(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .echo-range::-webkit-slider-thumb,
+  .echo-range::-moz-range-thumb {
+    transition: none;
+  }
+}
+
 @keyframes echo-pulse {
   0% {
     transform: scale(1);

@@ -3,10 +3,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-Round%201%20prototype-6152be" alt="Status: Round 1 prototype">
+  <img src="https://img.shields.io/badge/status-prototype-6152be" alt="Status: prototype">
   <img src="https://img.shields.io/badge/Next.js-16-262340" alt="Next.js 16">
   <img src="https://img.shields.io/badge/TypeScript-strict-3178c6" alt="TypeScript">
-  <img src="https://img.shields.io/badge/agents-9-21826c" alt="9 agents">
+  <img src="https://img.shields.io/badge/agents-10-21826c" alt="10 agents">
   <img src="https://img.shields.io/badge/on--device%20target-Gemma%203n-8b7bdd" alt="On-device target: Gemma 3n">
 </p>
 
@@ -16,12 +16,16 @@ it's happened before, and what a modeled "what if" scenario might look like.** I
 built around one synthetic demo patient (Meera Sharma, 72) with six months of mock
 cognitive, speech, routine, caregiver, and imaging data.
 
-This repository is the **Round 1 prototype**: the product experience and the
-agent-based workflow are fully built and interactive. The on-device model is
-intentionally mocked — a cloud call or a deterministic template stand in for it —
-so the complete product can be evaluated before the on-device build exists. See
-[Round 1 → Round 2](#round-1--round-2) below for the honest breakdown of what's
-real versus what's a placeholder.
+It's more than a passive monitoring dashboard: alongside the caregiver-facing
+analysis, three **active-recall mini-games** turn the same real Twin data — people,
+routines, recent history — into retrieval-practice exercises for the patient, not
+just charts for someone else to read.
+
+The product experience and the ten-agent workflow are fully built and interactive.
+The on-device model is intentionally mocked — a cloud call or a deterministic
+template stand in for it — so the complete product can be evaluated before the
+on-device build exists. See [What's built vs. what's a placeholder](#whats-built-vs-whats-a-placeholder)
+for the honest breakdown.
 
 ## See it running
 
@@ -31,13 +35,17 @@ real versus what's a placeholder.
 
 <table>
 <tr>
-<td width="50%">
+<td width="33%">
 <img src="./docs/screenshots/brain-twin.png" width="100%" alt="Brain Twin page with the Jan-Jun timeline scrubbed to April, showing region status and evidence">
 <p align="center"><sub>Brain Twin — scrub the timeline, state evolves month by month</sub></p>
 </td>
-<td width="50%">
+<td width="33%">
 <img src="./docs/screenshots/investigate.png" width="100%" alt="Investigate page showing a tool-execution trace and a synthesized, sourced answer">
 <p align="center"><sub>Investigate — agents run, then a grounded answer is synthesized</sub></p>
+</td>
+<td width="33%">
+<img src="./docs/screenshots/recall.png" width="100%" alt="Active Recall page showing three mini-games generated from real Twin data: a people quiz, a routine-ordering game, and a timeline-ordering game">
+<p align="center"><sub>Active Recall — three games, generated from real Twin data</sub></p>
 </td>
 </tr>
 </table>
@@ -53,12 +61,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Which LLM is ECHO using?
 
-| | Round 1 (this repo, today) | Round 2 (on-device, planned) |
+| | Today | On-device (planned) |
 |---|---|---|
 | **Model** | Google **Gemini** (`gemini-2.0-flash`) via `@google/generative-ai` — optional; a deterministic template is the default with no API key set | **Gemma 3n**, E2B variant, **INT4** quantized |
 | **Runtime** | Cloud REST call | On-device, via the **MediaPipe LLM Inference API** |
 | **Fallback** | Template built from the same structured data, fully offline | **Gemma 3 4B** via `llama.cpp` (GGUF, Q4_K_M) if the NPU delegate is unreliable on the target chipset |
-| **Why this model** | Zero setup cost for a Round 1 prototype | Natively multimodal (text/audio/image in one model instead of three separately-loaded ones) and its matryoshka architecture keeps INT4 memory small enough for phone RAM budgets — full reasoning in [`docs/ON_DEVICE_ARCHITECTURE.md`](docs/ON_DEVICE_ARCHITECTURE.md) |
+| **Why this model** | Zero setup cost for a prototype | Natively multimodal (text/audio/image in one model instead of three separately-loaded ones) and its matryoshka architecture keeps INT4 memory small enough for phone RAM budgets — full reasoning in [`docs/ON_DEVICE_ARCHITECTURE.md`](docs/ON_DEVICE_ARCHITECTURE.md) |
 
 To enable the live Gemini path instead of the offline template:
 
@@ -69,7 +77,7 @@ cp .env.local.example .env.local
 
 No other code path changes — every other agent's output is identical either way;
 only the Synthesis Agent's backend changes. That's deliberate: it's the same
-swap-a-backend-behind-one-interface pattern the Round 2 on-device build uses (see
+swap-a-backend-behind-one-interface pattern the on-device build uses (see
 `android-reference/app/.../agents/SynthesisEngine.kt`).
 
 ## Pages
@@ -82,42 +90,35 @@ swap-a-backend-behind-one-interface pattern the Round 2 on-device build uses (se
 | `/memory` | Interactive graph of the patient's people, places, events, routines, and stories (the "Life Twin") |
 | `/investigate` | Ask the Twin a question (preset or free text); returns a tool-execution trace plus a sourced, structured answer |
 | `/scenario` | "What if" simulator — adjust routine/social/sleep variables and see a modeled (not clinical) projection |
-| `/upload` | Real data-ingestion interactions: live acoustic speech analysis (genuine Web Audio API DSP) and an honest MRI upload preview that does not fabricate clinical numbers |
-| `/architecture` | The agent roster below, rendered live — status, responsibilities, and Round 1 vs. Round 2 backend for each agent |
+| `/recall` | Three active-recall mini-games generated by the Recall Agent from real Twin data — people & relationships, routine ordering, timeline ordering |
+| `/architecture` | The agent roster below, rendered live — status, responsibilities, and today vs. planned backend for each agent |
 
 ## Architecture
 
+ECHO is ten specialized agents, not one model doing everything. **Eight are pure
+deterministic computation and stay that way even in the on-device build** — a
+caregiver-facing tool that reports a memory score, runs a "what if" simulation, or
+generates a recall-game round should give the same answer every time, never a
+hallucinated one. Only the Synthesis Agent generates language, and it's the only
+agent that changes on-device.
+
 <p align="center">
-  <img src="./docs/screenshots/architecture.png" width="100%" alt="The live /architecture page — 9 agents with status badges and the question-answering pipeline">
+  <img src="./docs/multi-agent-workflow.gif" width="100%" alt="Animated diagram of the full on-device multi-agent workflow: Speech and Vision agents feeding Patient Data, a Question routed through the Router Agent to four deterministic tool agents, converging on the on-device Synthesis Agent, with the Monitoring Agent watching Twin state independently and firing notifications">
+  <br><sub>Source: <a href="docs/multi-agent-workflow.svg">docs/multi-agent-workflow.svg</a></sub>
 </p>
 
-ECHO is nine specialized agents, not one model doing everything. **Five are pure
-deterministic computation and stay that way even in the on-device build** — a
-caregiver-facing tool that reports a memory score or runs a "what if" simulation
-should give the same answer every time, never a hallucinated one. Only the
-Synthesis Agent generates language, and it's the only agent Round 2 replaces.
+Speech, Vision, Monitoring, and Recall agents run outside the question-answering
+path itself — Speech and Vision are input-side capture, Monitoring runs
+continuously in the background firing real notifications, and Recall generates its
+own game rounds on demand at `/recall`. The question-answering path is:
+**Question → Router Agent → the four deterministic tool agents (in parallel) →
+Synthesis Agent → Answer.**
 
-```
-Question
-   │
-   ▼
-Router Agent ──► Progression Agent
-   │         ├──► Evidence Agent
-   │         ├──► Memory Agent
-   │         └──► Scenario Agent
-   │                   │
-   ▼                   ▼
-        Synthesis Agent
-                │
-                ▼
-             Answer
-```
+<p align="center">
+  <img src="./docs/screenshots/architecture.png" width="100%" alt="The live /architecture page — 10 agents with status badges">
+</p>
 
-*(Speech, Vision, and Monitoring agents run outside this question-answering path —
-Speech and Vision are input-side capture, Monitoring runs continuously against
-Twin state rather than in response to a question.)*
-
-| Agent | Status | Deterministic? | Round 1 backend | Round 2 backend |
+| Agent | Status | Deterministic? | Today | Planned (on-device) |
 |---|---|---|---|---|
 | **Router** | Built | Yes | Keyword intent classification | Unchanged |
 | **Progression** | Built | Yes | Baseline/trend arithmetic | Unchanged — it's math, not language |
@@ -126,7 +127,8 @@ Twin state rather than in response to a question.)*
 | **Scenario** | Built | Yes | Transparent heuristic simulation | Unchanged — stays non-generative on purpose |
 | **Speech** | Partial | Yes today | Real Web Audio API acoustic analysis | Gemma 3n native audio input |
 | **Vision** | Planned | No | Typed stub, throws on purpose | Gemma 3n native image input |
-| **Monitoring** | Built (new) | Yes | Real browser `Notification`, permission-gated | Native Android notification |
+| **Monitoring** | Built | Yes | Real browser `Notification`, permission-gated | Native Android notification |
+| **Recall** | Built | Yes | 3 mini-games generated from real Memory/Progression Agent data | Unchanged — same reasoning as Progression/Scenario |
 | **Synthesis** | Partial | No | Cloud Gemini or deterministic template | **The swap point** — Gemma 3n (E2B, INT4) on-device |
 
 This table is generated from, and must stay consistent with,
@@ -134,7 +136,7 @@ This table is generated from, and must stay consistent with,
 source of truth; it also drives the `/architecture` page directly, so this isn't
 a documentation claim someone has to take on faith.
 
-## What Round 1 mocks vs. what's actually built
+## What's built vs. what's a placeholder
 
 **Genuinely built, not mocked:**
 - Personal-baseline computation, trend detection, and the deviation timeline — real
@@ -149,17 +151,22 @@ a documentation claim someone has to take on faith.
   `Notification`, triggered by the dashboard's bell button, not a cosmetic badge.
 - The tool-execution trace on `/investigate` — genuinely reflects which agent
   functions ran, in order, for a given question.
+- The three `/recall` games — every round and every correct answer is derived from
+  the same real mock data the rest of the app reads (the Memory graph's actual
+  relationships, the real routine step times, the Progression Agent's real
+  first-detected-change events), not separately-authored trivia content.
 
-**Intentionally mocked for Round 1** (this is the placeholder Round 2 replaces, not
-a Round 1 defect):
+**Intentionally a placeholder** (this is what the on-device build replaces, not a
+defect):
 - The Synthesis Agent's model backend — cloud Gemini or a deterministic template
   stand in for the on-device Gemma 3n call. Both read identical structured input;
-  only the "writer" differs, which is exactly the interface Round 2 swaps behind.
-- The Vision Agent — not implemented at all in Round 1; a typed stub
-  (`visionAgent.matchPhoto`) documents the intended Round 2 contract without faking
-  a working camera feature.
+  only the "writer" differs, which is exactly the interface the on-device build
+  swaps behind.
+- The Vision Agent — not implemented at all yet; a typed stub
+  (`visionAgent.matchPhoto`) documents the intended contract without faking a
+  working camera feature.
 
-## Round 1 → Round 2
+## On-device roadmap
 
 **Primary on-device model: Gemma 3n (E2B, INT4)** via the MediaPipe LLM Inference
 API. **Fallback: Gemma 3 4B** (GGUF, Q4_K_M) via `llama.cpp`. Both the reasoning and
@@ -177,10 +184,11 @@ written-but-not-yet-compiled code, not a working Android app.
 src/
 ├── app/                    Next.js App Router pages + API routes
 │   ├── architecture/       Live agent-roster page
-│   ├── upload/              Speech (real DSP) + MRI (honest preview) upload flows
+│   ├── recall/              Three active-recall mini-games
 │   ├── api/investigate/    POST → runs the agent pipeline + Synthesis Agent
 │   └── api/simulate/       POST → runs the Scenario Agent
-├── components/             UI: BrainTwin, TimelineScrubber, AgentCard, etc.
+├── components/
+│   └── recall/              PeopleRecallGame, RoutineRecallGame, TimelineRecallGame
 └── lib/
     ├── mockData.ts         The synthetic patient dataset (single source of truth for data)
     ├── twin.ts             Personal-baseline + trend computation, with an "as of month" parameter
@@ -190,14 +198,14 @@ src/
     ├── types.ts             Shared TypeScript types
     └── agents/              Named agent layer — the single source of truth for the
                               roster above (index.ts), thin wrappers over the files
-                              above (routerAgent.ts, progressionAgent.ts, etc.)
+                              above (routerAgent.ts, progressionAgent.ts, recallAgent.ts, etc.)
 
-android-reference/          Kotlin reference implementation for the Round 2 on-device
+android-reference/          Kotlin reference implementation for the on-device
                               Synthesis Agent (MediaPipe LLM Inference API / Gemma 3n).
                               NOT a working Android project — see its README for what's
                               verified vs. what still needs testing on real hardware.
 
-docs/ON_DEVICE_ARCHITECTURE.md   The Round 2 model/quantization/feasibility reasoning.
+docs/ON_DEVICE_ARCHITECTURE.md   The on-device model/quantization/feasibility reasoning.
 ```
 
 **The brain visualization** (`public/brain-lobes-interactive.svg`) is a real
@@ -216,7 +224,7 @@ baseline — this is the core premise of the product, not just a dashboard featu
 
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS v4
-- `@google/generative-ai` (Gemini) for the Round 1 Synthesis Agent's optional cloud backend
+- `@google/generative-ai` (Gemini) for the Synthesis Agent's optional cloud backend
 - `lucide-react` for icons
 - No database — all data lives in `src/lib/mockData.ts` for this prototype
 
@@ -230,7 +238,7 @@ baseline — this is the core premise of the product, not just a dashboard featu
 - Multiple patients, auth, and role-based views (patient / caregiver / clinician)
 - Twin versioning / update pipeline from new incoming data
 - Installable/offline packaging (PWA or native) — currently a standard hosted web app,
-  which will not survive an offline (Red Light) constraint as-is; see
+  which will not survive an offline constraint as-is; see
   `docs/ON_DEVICE_ARCHITECTURE.md` §6
 
 ## Disclaimer
